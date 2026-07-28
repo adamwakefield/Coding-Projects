@@ -1,0 +1,127 @@
+# Book Rag
+
+A local LLM that answers questions about the lore of my novel series — powered by [Ollama](https://ollama.com), grounded in my Obsidian worldbuilding vault, and running entirely on my own machine.
+
+## Overview
+
+Loremaster turns years of scattered worldbuilding notes into something you can *ask*. It reads the markdown notes from an Obsidian vault, indexes them, and uses a locally-hosted language model (via Ollama) to answer questions about characters, places, timelines, and history — with the answers grounded in the actual source notes rather than made up.
+
+Because everything runs locally through Ollama, no notes or queries ever leave the machine, and there are no API costs.
+
+<!-- TODO: adjust the paragraph above if your approach is fine-tuning rather than
+retrieval over the vault. The template below assumes a RAG (retrieval) setup,
+which matches "connect it to the Obsidian vault." -->
+
+## Features
+
+- Answers natural-language questions about the series' lore
+- Grounds every answer in the actual Obsidian notes (retrieval, not hallucination)
+- Runs fully offline via Ollama — no external APIs, no data leaving the machine
+- Point it at any Obsidian vault (or folder of markdown) and re-index
+
+## Requirements
+
+- Python 3.11+
+- [Ollama](https://ollama.com) installed and running locally
+- A pulled model — e.g. `ollama pull llama3.1` <!-- TODO: your actual model -->
+- An Obsidian vault (or any folder of `.md` notes) as the lore source
+- Dependencies listed in `requirements.txt`
+
+<!-- TODO: list your real major deps here, e.g. an embeddings library and a
+vector store — chromadb, faiss, llama-index, langchain, etc. -->
+
+## Installation
+
+```bash
+git clone https://github.com/yourname/loremaster.git
+cd loremaster
+python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Make sure Ollama is running and your model is pulled:
+
+```bash
+ollama pull llama3.1           # TODO: your model
+ollama serve                   # if not already running as a service
+```
+
+## Configuration
+
+Copy the example config and point it at your vault:
+
+```bash
+cp .env.example .env
+# then edit .env
+```
+
+| Variable        | Description                                   | Required |
+|-----------------|-----------------------------------------------|----------|
+| `VAULT_PATH`    | Path to your Obsidian vault / notes folder    | Yes      |
+| `OLLAMA_MODEL`  | Model name to use (e.g. `llama3.1`)           | Yes      |
+| `OLLAMA_HOST`   | Ollama endpoint (default `http://localhost:11434`) | No  |
+| `EMBED_MODEL`   | Embedding model for indexing notes            | No       |
+
+<!-- TODO: match these to whatever your program actually reads. -->
+
+## Usage
+
+First, index your vault (run once, and again whenever notes change):
+
+```bash
+python index.py               # TODO: your real command
+```
+
+Then ask it things:
+
+```bash
+python ask.py "Who rules the northern kingdom and how did they come to power?"
+```
+
+Or interactively:
+
+```bash
+python ask.py
+> What's the relationship between <Character A> and <Character B>?
+```
+
+<!-- TODO: replace with your actual entry points and a real example question
++ a snippet of real output. Real output is the single most convincing thing
+you can put in a README. -->
+
+## How It Works
+
+1. **Ingest** — Loads markdown notes from the Obsidian vault, splitting them into
+   chunks small enough to retrieve precisely but large enough to keep context.
+2. **Embed & index** — Each chunk is embedded and stored in a local vector index.
+3. **Retrieve** — At question time, the most relevant chunks are pulled from the index.
+4. **Generate** — Those chunks are passed as context to the Ollama model, which
+   answers the question grounded in the retrieved lore.
+
+<!-- TODO: correct this to your real architecture. If you fine-tuned instead,
+replace steps 2–4 with your training/inference flow. This section is the one
+that shows you understand your own system — keep it accurate. -->
+
+## Project Structure
+
+```
+loremaster/
+├── index.py          # builds the vector index from the vault
+├── ask.py            # query entry point
+├── src/              # ingestion, retrieval, generation modules
+├── .env.example      # config template
+└── requirements.txt
+```
+
+<!-- TODO: match to your real layout. -->
+
+## Roadmap
+
+- [ ] <!-- e.g. incremental re-indexing on note changes -->
+- [ ] <!-- e.g. citation of which note each answer came from -->
+- [ ] <!-- e.g. simple web UI instead of CLI -->
+
+## License
+
+<!-- TODO: pick one. MIT is a safe default for a portfolio project. -->
